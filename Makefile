@@ -43,9 +43,9 @@ git-diff :
 
 # Deploy
 deploy-libs-one	:;
-	FOUNDRY_PROFILE=${chain} forge script scripts/misc/LibraryPreCompileOne.sol --rpc-url ${chain} --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --slow --broadcast
+	FOUNDRY_PROFILE=${chain} forge script scripts/misc/LibraryPreCompileOne.sol --rpc-url ${chain} --slow --broadcast
 deploy-libs-two	:;
-	FOUNDRY_PROFILE=${chain} forge script scripts/misc/LibraryPreCompileTwo.sol --rpc-url ${chain} --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --slow --broadcast
+	FOUNDRY_PROFILE=${chain} forge script scripts/misc/LibraryPreCompileTwo.sol --rpc-url ${chain} --slow --broadcast
 
 deploy-libs :
 	make deploy-libs-one chain=${chain}
