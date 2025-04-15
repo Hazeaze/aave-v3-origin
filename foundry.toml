@@ -29,7 +29,7 @@ evm_version = 'london'
 mainnet = "${RPC_MAINNET}"
 testnet = "${RPC_TESTNET}"
 
-[etherscan]
-mainnet = { key = "${ETHERSCAN_API_KEY_MAINNET}", chainId = 12211 }
-testnet = { key = "${ETHERSCAN_API_KEY_TESTNET}", chainId = 12211 }
+# [etherscan]
+# mainnet = { key = "${ETHERSCAN_API_KEY_MAINNET}", chainId = 12211 }
+# testnet = { key = "${ETHERSCAN_API_KEY_TESTNET}", chainId = 12211 }
 # See more config options https://github.com/gakonst/foundry/tree/master/config
