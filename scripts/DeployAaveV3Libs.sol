@@ -9,6 +9,7 @@ import {AaveV3LibrariesBatch2} from '../src/deployments/projects/aave-v3-librari
 import {IMetadataReporter} from '../src/deployments/interfaces/IMetadataReporter.sol';
 import {DeployUtils} from '../src/deployments/contracts/utilities/DeployUtils.sol';
 import {FfiUtils} from '../src/deployments/contracts/utilities/FfiUtils.sol';
+import {Create2Utils} from '../src/deployments/contracts/utilities/Create2Utils.sol';
 
 /**
  * # Deploy and verify on testnet (include --verify flag for automatic verification)
@@ -29,13 +30,7 @@ contract DeployAaveV3Libs is FfiUtils, Script, DeployUtils {
     console.log('=== Aave V3 Library Deployment ===');
     console.log('Sender:', msg.sender);
 
-    address factory = vm.computeCreate2Address(bytes32(0), keccak256(createV2FactoryBytecode));
-    console.log('Factory deployed at:', factory);
-
-    if (factory.code.length == 0) {
-      deployCreateV2Factory();
-    }
-
+    deployCreateV2Factory();
     // Deploy first batch of libraries
     deployBatchOne();
 
@@ -51,17 +46,17 @@ contract DeployAaveV3Libs is FfiUtils, Script, DeployUtils {
     address factory;
     bytes memory bytecode = createV2FactoryBytecode;
     assembly {
-      factory := create2(0, add(bytecode, 0x20), mload(bytecode), 0x00)
+      factory := create(0, add(bytecode, 0x20), mload(bytecode))
     }
-
+    
     require(factory.code.length > 0, 'Factory deployment failed');
+    require(factory == Create2Utils.CREATE2_FACTORY, 'Factory deployment failed, update the factory address in the Create2Utils');
   }
 
   function deployBatchOne() internal {
     console.log('Deploying Batch 1 Libraries...');
 
     bool found = _librariesPathExists();
-
     if (found) {
       address lastLib = _getLatestLibraryAddress();
       if (lastLib.code.length > 0) {
