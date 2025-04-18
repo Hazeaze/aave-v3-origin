@@ -15,15 +15,20 @@ contract AaveV3LibrariesBatch2 is LibraryReportStorage {
   }
 
   function _deployAaveV3Libraries() internal returns (LibrariesReport memory libReport) {
-    bytes32 salt = keccak256('AAVE_V3_LIBRARIES_BATCH');
-
-    libReport.flashLoanLogic = Create2Utils._create2Deploy(salt, type(FlashLoanLogic).creationCode);
-    libReport.liquidationLogic = Create2Utils._create2Deploy(
-      salt,
-      type(LiquidationLogic).creationCode
-    );
-    libReport.poolLogic = Create2Utils._create2Deploy(salt, type(PoolLogic).creationCode);
-    libReport.supplyLogic = Create2Utils._create2Deploy(salt, type(SupplyLogic).creationCode);
+    libReport.flashLoanLogic = _deployLibrary(type(FlashLoanLogic).creationCode);
+    libReport.liquidationLogic = _deployLibrary(type(LiquidationLogic).creationCode);
+    libReport.poolLogic = _deployLibrary(type(PoolLogic).creationCode);
+    libReport.supplyLogic = _deployLibrary(type(SupplyLogic).creationCode);
     return libReport;
+  }
+
+  // Helper function for deploying libraries
+  function _deployLibrary(bytes memory bytecode) internal returns (address addr) {
+    assembly {
+      addr := create(0, add(bytecode, 0x20), mload(bytecode))
+      if iszero(extcodesize(addr)) {
+        revert(0, 0)
+      }
+    }
   }
 }

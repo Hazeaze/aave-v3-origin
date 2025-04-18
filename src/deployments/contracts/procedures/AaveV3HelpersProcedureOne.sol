@@ -21,13 +21,13 @@ contract AaveV3HelpersProcedureOne {
   ) internal returns (ConfigEngineReport memory configEngineReport) {
     IAaveV3ConfigEngine.EngineLibraries memory engineLibraries = IAaveV3ConfigEngine
       .EngineLibraries({
-        listingEngine: Create2Utils._create2Deploy('v1', type(ListingEngine).creationCode),
-        eModeEngine: Create2Utils._create2Deploy('v1', type(EModeEngine).creationCode),
-        borrowEngine: Create2Utils._create2Deploy('v1', type(BorrowEngine).creationCode),
-        collateralEngine: Create2Utils._create2Deploy('v1', type(CollateralEngine).creationCode),
-        priceFeedEngine: Create2Utils._create2Deploy('v1', type(PriceFeedEngine).creationCode),
-        rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
-        capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
+        listingEngine: _deployLibrary(type(ListingEngine).creationCode),
+        eModeEngine: _deployLibrary(type(EModeEngine).creationCode),
+        borrowEngine: _deployLibrary(type(BorrowEngine).creationCode),
+        collateralEngine: _deployLibrary(type(CollateralEngine).creationCode),
+        priceFeedEngine: _deployLibrary(type(PriceFeedEngine).creationCode),
+        rateEngine: _deployLibrary(type(RateEngine).creationCode),
+        capsEngine: _deployLibrary(type(CapsEngine).creationCode)
       });
 
     IAaveV3ConfigEngine.EngineConstants memory engineConstants = IAaveV3ConfigEngine
@@ -52,5 +52,15 @@ contract AaveV3HelpersProcedureOne {
       new AaveV3ConfigEngine(aTokenImpl, vTokenImpl, engineConstants, engineLibraries)
     );
     return configEngineReport;
+  }
+
+  // Helper function for deploying libraries
+  function _deployLibrary(bytes memory bytecode) internal returns (address addr) {
+    assembly {
+      addr := create(0, add(bytecode, 0x20), mload(bytecode))
+      if iszero(extcodesize(addr)) {
+        revert(0, 0)
+      }
+    }
   }
 }

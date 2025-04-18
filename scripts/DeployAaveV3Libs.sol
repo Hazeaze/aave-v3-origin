@@ -11,26 +11,11 @@ import {DeployUtils} from '../src/deployments/contracts/utilities/DeployUtils.so
 import {FfiUtils} from '../src/deployments/contracts/utilities/FfiUtils.sol';
 import {Create2Utils} from '../src/deployments/contracts/utilities/Create2Utils.sol';
 
-/**
- * # Deploy and verify on testnet (include --verify flag for automatic verification)
-    forge script scripts/DeployAaveV3Libs.sol --rpc-url testnet --slow --broadcast --verify
- * # Deploy and verify on mainnet
-    forge script scripts/DeployAaveV3Libs.sol --rpc-url mainnet --slow --broadcast --verify
- */
 contract DeployAaveV3Libs is FfiUtils, Script, DeployUtils {
-  bytes public createV2FactoryBytecode;
-
-  constructor() {
-    createV2FactoryBytecode = bytes(
-      hex'604580600e600039806000f350fe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf3'
-    );
-  }
-
   function run() external {
     console.log('=== Aave V3 Library Deployment ===');
     console.log('Sender:', msg.sender);
 
-    deployCreateV2Factory();
     // Deploy first batch of libraries
     deployBatchOne();
 
@@ -40,17 +25,6 @@ contract DeployAaveV3Libs is FfiUtils, Script, DeployUtils {
     console.log('=== Library Deployment Complete ===');
     console.log('Note: If you did not include the --verify flag, run verification manually with:');
     console.log('forge verify-contract <DEPLOYED_ADDRESS> <CONTRACT_NAME> --chain <CHAIN_ID>');
-  }
-
-  function deployCreateV2Factory() internal {
-    address factory;
-    bytes memory bytecode = createV2FactoryBytecode;
-    assembly {
-      factory := create(0, add(bytecode, 0x20), mload(bytecode))
-    }
-    
-    require(factory.code.length > 0, 'Factory deployment failed');
-    require(factory == Create2Utils.CREATE2_FACTORY, 'Factory deployment failed, update the factory address in the Create2Utils');
   }
 
   function deployBatchOne() internal {
